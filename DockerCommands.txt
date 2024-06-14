@@ -1,0 +1,90 @@
+1. In order to create docker image using Docker file":
+    -t stands for tag, . stands for current direactory
+
+    command: docker build -t krishna/docker-helloworld . 
+
+2. TO get all imagees: command:- docker images
+ex: PS C:\Users\KRNAND\Desktop\dokerhelps> docker images
+REPOSITORY                  TAG       IMAGE ID       CREATED          SIZE
+krishna/docker-helloworld   latest    c1faad44ccb8   45 seconds ago   526MB
+myjavaimage                 latest    51147dfc5737   2 months ago     470MB
+myubuntuimage               latest    8c4e37beeb8f   2 months ago     125MB
+mysql                       latest    56b21e040954   2 months ago     632MB
+quay.io/keycloak/keycloak   23.0.4    5ab52519e2e6   2 months ago     459MB
+
+3. TO run images/start conatiner:- docker run REPOSITORY_name
+    ex: docker run krishna/docker-helloworld
+
+4. To see the running/stoped conatiner : docker ps -a
+
+5. To remove docker conatiner: docker rm <"conatiner_id">
+    docker rm 47d
+    47d
+
+6. To remove image: docker image rm <"image_id">
+    Untagged: krishna1/docker-helloworld:latest
+    Deleted: sha256:cda49a7c4db6fbfaaf9f6a6272176b1ba139b34afa010daf81c9622169cad10b
+
+7. Push image to DockerHub:- docker push nandkrishna1999/docker-helloworld (first you need to login in CLI)
+
+
+
+===============================================================================================================
+
+
+Dockerize Spring Boot application with mysql
+1. docker pull mysql:5.7
+2. Create Docker Network
+    cmd: docker network create springboot-mysql-net
+    a34c0efa51190b1e3059e2bbc401e9572e74acc7f35b774625f7ce72eac540ad
+
+    cmd: docker network ls
+    NETWORK ID     NAME                   DRIVER    SCOPE
+    93b57ab892cb   bridge                 bridge    local
+    8f4f91599bb2   host                   host      local
+    87b989b40f9c   none                   null      local
+    a34c0efa5119   springboot-mysql-net   bridge    local
+
+3. Step 3:
+
+Run the mysql container in the network
+
+docker run --name mysqldb --network springboot-mysql-net -e MYSQL_ROOT_PASSWORD=1234 -e MYSQL_DATABASE=contactapplication -e MYSQL_USER=sa -e MYSQL_PASSWORD=1234 -d mysql:5.7
+
+5. docker ps
+CONTAINER ID   IMAGE       COMMAND                  CREATED         STATUS         PORTS                 NAMES
+12d63cdce572   mysql:5.7   "docker-entrypoint.s…"   4 seconds ago   Up 3 seconds   3306/tcp, 33060/tcp   mysqldb
+
+6. C:\Users\KRNAND>docker exec -it 12d bash
+    bash-4.2# mysql -usa -p1234
+    mysql: [Warning] Using a password on the command line interface can be insecure.
+    Welcome to the MySQL monitor.  Commands end with ; or \g.
+    Your MySQL connection id is 2
+    Server version: 5.7.44 MySQL Community Server (GPL)
+
+    Copyright (c) 2000, 2023, Oracle and/or its affiliates.
+
+    Oracle is a registered trademark of Oracle Corporation and/or its
+    affiliates. Other names may be trademarks of their respective
+    owners.
+
+    Type 'help;' or '\h' for help. Type '\c' to clear the current input statement.
+
+    mysql> v^C
+    mysql> show databases;
+    +--------------------+
+    | Database           |
+    +--------------------+
+    | information_schema |
+    | contactapplication |
+    +--------------------+
+    2 rows in set (0.00 sec)
+
+    mysql> use contactapplication;
+    Database changed
+    mysql> show tables;
+    Empty set (0.00 sec)
+
+
+7. Run Spring application 
+    docker run --network springboot-mysql-net --name springboot-container -p 8080:8080 apiapplicationmysql  
